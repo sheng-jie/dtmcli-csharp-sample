@@ -1,6 +1,8 @@
 using Dtmcli;
+using DtmSample.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -22,6 +24,11 @@ namespace DtmSample
 
         public void ConfigureServices(IServiceCollection services)
         {
+            var connectionStr = Configuration.GetConnectionString("DtmDemoWebApiContext");
+            services.AddDbContext<DtmDemoWebApiContext>(
+                options => { options.UseMySql(connectionStr ?? throw new InvalidOperationException("Connection string 'DtmDemoWebApiContext' not found."), ServerVersion.AutoDetect(connectionStr)); }
+                );
+
             services.AddDtmcli(dtm => dtm.DtmUrl = Configuration.GetValue<string>("AppSettings:DtmUrl"));
 
             services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
